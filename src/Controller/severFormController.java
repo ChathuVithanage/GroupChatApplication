@@ -1,20 +1,22 @@
 package Controller;
 
-import com.sun.corba.se.pept.transport.Acceptor;
-import com.sun.corba.se.pept.transport.ListenerThread;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import util.Server;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.ServerSocket;
+
 import java.net.Socket;
-import java.util.ArrayList;
+import Thread.Flusher;
+import java.util.HashMap;
 import java.util.Timer;
 
 public class severFormController {
@@ -23,36 +25,70 @@ public class severFormController {
     public static String Username;
     public AnchorPane root;
 
-    /*public void initialize() throws IOException {
-        // setting up the server
-        System.out.println("server up and running!");
-        int PORT = 8000;
-        serverSocket  = new ServerSocket(PORT);
-        // wait for an connection to be established --> binds it to a local socket --> returns the remote socket
-        Thread serverWaitingThread = new Thread(() -> {
-            try {
-                localSocket = serverSocket.accept();
-                System.out.println("connection succeeded!");
+    Stage stage;
 
-                outputStream = new DataOutputStream(localSocket.getOutputStream());
-                inputStream = new DataInputStream(localSocket.getInputStream());
-            } catch (IOException e) {
-                e.printStackTrace();
+    Server server;
+    Thread mainThread;
+
+    Socket localSocket;
+    public static HashMap<Integer,DataOutputStream> clients = new HashMap<>();
+
+    public void initialize() throws IOException {
+
+        // open up the server
+        server = new Server(8080, 5);
+
+        mainThread = new Thread(() -> {
+            while (true) {
+                try {
+                    localSocket = server.accept();
+                    Timer timer = new Timer();
+                    timer.schedule(new Flusher(new DataInputStream(localSocket.getInputStream()),timer),0,2000);
+                    clients.put(localSocket.getPort(), new DataOutputStream(localSocket.getOutputStream()));
+                } catch (IOException e) {
+                    System.out.println(e.getMessage());
+                }
             }
         });
-        serverWaitingThread.start();
-    }*/
+
+        mainThread.start();
+
+        Platform.runLater(() -> {
+            stage.setOnCloseRequest(e -> {
+                mainThread.interrupt();
+                // TODO : have to check why jvm is not exiting from above code block
+                System.exit(0);
+            });
+        });
+    }
 
     public void LogOnAction(ActionEvent actionEvent) throws IOException {
-        Username=txtUsername.getText();
 
-        Stage stage1 = (Stage) txtUsername.getScene().getWindow();
-        stage1.close();
-        Stage stage2=new Stage();
-        stage2.setScene(new Scene(FXMLLoader.load(getClass().getResource("../View/clientForm.fxml"))));
-        stage2.setResizable(false);
-        stage2.setTitle("sample title");
-        stage2.centerOnScreen();
-        stage2.show();
+        // opening chatArea
+        Stage clientStage = new Stage(StageStyle.DECORATED);
+        FXMLLoader loader = new FXMLLoader(this.getClass().getClassLoader().getResource("View/clientForm.fxml"));
+        Scene client = new Scene(loader.load());
+
+        clientStage.setScene(client);
+        clientStage.setTitle("User : " + txtUsername.getText());
+        clientStage.setResizable(false);
+        clientStage.sizeToScene();
+
+        try {
+            clientFormController controller = loader.getController();
+            controller.initData(txtUsername.getText(),clientStage);
+        }catch (NullPointerException e){
+            System.out.println(e.getMessage());
+        }
+
+        clientStage.show();
+        txtUsername.clear();
+
     }
+
+    public void initData (Stage stage) {
+        this.stage = stage;
+    }
+
 }
+
