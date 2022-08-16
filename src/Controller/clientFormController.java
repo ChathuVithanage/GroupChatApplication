@@ -45,6 +45,7 @@ public class clientFormController{
     public Label lblName;
     public VBox msgBox;
     public ScrollPane scrollPane;
+    public Pane emojiPane;
 
     Client client;
     String txtUsername;
@@ -94,9 +95,8 @@ public class clientFormController{
 
     public boolean sendMsg(String txtUsername) throws IOException {
 
-        // TODO : bypass all the empty spaces after and before
         if (!txtMessage.getText().equals("")){
-            String msg = txtUsername + " :\n" + txtMessage.getText();
+            String msg = txtUsername + " : " + txtMessage.getText();
             payload = msg.getBytes(StandardCharsets.UTF_16);
             int len = payload.length;
 
@@ -109,8 +109,6 @@ public class clientFormController{
 
             return true;
         } else return false;
-
-
     }
 
 
@@ -121,7 +119,7 @@ public class clientFormController{
 
 
     // TODO : pass the file type before sending file
-    public void uploadPhoto(MouseEvent mouseEvent) throws IOException {
+    public void uploadPhoto(MouseEvent mouseEvent) throws IOException, InterruptedException {
 
         File selectedFile = fileChooser.showOpenDialog(stage);
 
@@ -134,10 +132,24 @@ public class clientFormController{
             ByteArrayOutputStream bout = new ByteArrayOutputStream();
             ImageIO.write(finalImage, res[1], bout);
 
+
             payload = bout.toByteArray();
             header = ByteBuffer.allocate(4).putInt(payload.length).array();
 
             byte[] frame = ArrayUtils.addAll(header,payload);
+
+            String msg = txtUsername + " : ";
+            byte[] payload2 = msg.getBytes(StandardCharsets.UTF_16);
+            int len2 = payload.length;
+
+            byte[] header2 = ByteBuffer.allocate(4).putInt(len2).array();
+            byte[] frame2 = addAll(header2,payload2);
+
+            client.getOut().write(0);
+            client.getOut().write(frame2);
+            client.getOut().flush();
+
+            Thread.sleep(2000);
 
             client.getOut().write(-1);
             client.getOut().write(frame);
@@ -149,6 +161,7 @@ public class clientFormController{
     }
 
     public void OpenEmoji(MouseEvent event) {
+        txtMessage.setText(txtMessage.getText() + "\\uD83D\\uDE00");
     }
 
     public void messageOnAction(ActionEvent event) throws IOException {
@@ -164,4 +177,5 @@ public class clientFormController{
             }
         }
     }
+
 }

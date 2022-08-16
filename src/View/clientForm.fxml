@@ -22,11 +22,6 @@
             <Image url="@../assest/send.png" />
          </image>
       </ImageView>
-      <Label fx:id="lblName" layoutX="51.0" layoutY="9.0" prefHeight="29.0" prefWidth="77.0" text="username" textFill="WHITE">
-         <font>
-            <Font name="System Bold" size="16.0" />
-         </font>
-      </Label>
       <ImageView fitHeight="30.0" fitWidth="30.0" layoutX="426.0" layoutY="609.0" onMouseReleased="#uploadPhoto">
          <image>
             <Image url="@../assest/dslr-camera.png" />
@@ -56,5 +51,11 @@
             </ScrollPane>
          </children>
       </Pane>
+      <Pane fx:id="emojiPane" layoutX="46.0" layoutY="566.0" prefHeight="79.0" prefWidth="144.0" />
+      <Label layoutX="46.0" layoutY="11.0" prefHeight="21.0" prefWidth="107.0" text="IJSE Friends" textFill="#cdc8c8">
+         <font>
+            <Font name="System Bold" size="17.0" />
+         </font>
+      </Label>
    </children>
 </AnchorPane>

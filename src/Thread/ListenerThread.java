@@ -70,8 +70,8 @@ public class ListenerThread extends TimerTask {
 
                         Image image = SwingFXUtils.toFXImage(imageData,null);
                         ImageView view = new ImageView(image);
-                        view.setFitHeight(250);
-                        view.setFitWidth(250);
+                        view.setFitHeight(100);
+                        view.setFitWidth(100);
                         view.setSmooth(true);
                         view.setPreserveRatio(true);
                         Platform.runLater(() -> {
