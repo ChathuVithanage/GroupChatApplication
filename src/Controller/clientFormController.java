@@ -161,7 +161,13 @@ public class clientFormController{
     }
 
     public void OpenEmoji(MouseEvent event) {
-        txtMessage.setText(txtMessage.getText() + "\\uD83D\\uDE00");
+        txtMessage.setText(txtMessage.getText() + "\uD83D\uDE18");
+        txtMessage.setText(txtMessage.getText() + "\uD83D\uDE0D");
+        txtMessage.setText(txtMessage.getText() + "\uD83D\uDE02");
+        txtMessage.setText(txtMessage.getText() + "\uD83D\uDE12");
+        txtMessage.setText(txtMessage.getText() + "\uD83D\uDE48");
+        txtMessage.setText(txtMessage.getText() + "\uD83D\uDE21");
+
     }
 
     public void messageOnAction(ActionEvent event) throws IOException {
